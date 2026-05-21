@@ -126,6 +126,36 @@ update_env_file(
 
 # ── Step 1 — Configure Environment ───────────────────────────────────────────
 print("\n── Step 1: Configure Environment ──")
+
+
+# Capture LINKED_EMAIL interactively if not already set in .env.
+# This email is used to:
+#   - Create the embedded wallet (linkedAccounts)
+#   - Log in to the wallet hub for funding and signing delegation
+# Use a real address you can receive mail at — the wallet provider may verify it.
+def _is_valid_email(s: str) -> bool:
+    s = s.strip()
+    return "@" in s and "." in s.split("@")[-1] and not s.startswith("<")
+
+
+current_email = os.environ.get("LINKED_EMAIL", "").strip()
+if not current_email or current_email.startswith("<") or current_email == "user@example.com":
+    print()
+    print("  We need your email address to set up your embedded wallet.")
+    print("  This email is used to:")
+    print("    - create your wallet account")
+    print("    - log in to the wallet hub for funding and signing approval")
+    print("  Use a real address you can receive mail at — the wallet provider")
+    print("  may send a verification link.")
+    print()
+    while True:
+        entered = input("  Enter your email: ").strip()
+        if _is_valid_email(entered):
+            break
+        print(f"  '{entered}' does not look like a valid email address. Try again.")
+    update_env_file(ENV_FILE, {"LINKED_EMAIL": entered})
+    print(f"  ✓ Email saved to {os.path.basename(ENV_FILE)}")
+
 load_dotenv(ENV_FILE, override=True)
 
 CREDENTIAL_PROVIDER_TYPE = os.environ.get("CREDENTIAL_PROVIDER_TYPE", "CoinbaseCDP")
@@ -134,23 +164,11 @@ _derived_connector_name = {
     "CoinbaseCDP": "MyCoinbaseConnector",
     "StripePrivy": "MyPrivyConnector",
 }.get(CREDENTIAL_PROVIDER_TYPE, "MyPaymentConnector")
-CONNECTOR_NAME = (
-    os.environ.get("DEFAULT_PAYMENT_CONNECTOR_NAME") or _derived_connector_name
-)
+CONNECTOR_NAME = os.environ.get("DEFAULT_PAYMENT_CONNECTOR_NAME") or _derived_connector_name
 USER_ID = os.environ.get("USER_ID", "test-user-001")
 NETWORK = os.environ.get("NETWORK", "ETHEREUM")
 
 LINKED_EMAIL = os.environ.get("LINKED_EMAIL", "").strip()
-if (
-    not LINKED_EMAIL
-    or LINKED_EMAIL.startswith("<")
-    or LINKED_EMAIL == "user@example.com"
-):
-    raise ValueError(
-        "LINKED_EMAIL is not set in .env. "
-        "Set it to a real email address you can receive mail at, then re-run.\n"
-        "Example: LINKED_EMAIL=you@example.com"
-    )
 
 print(f"  Provider: {CREDENTIAL_PROVIDER_TYPE}")
 print(f"  Region:   {AWS_REGION}")
@@ -180,12 +198,8 @@ print("  ✅ All 4 IAM roles present.")
 print("\n── Step 3: Create boto3 Clients ──")
 print("Assuming ControlPlaneRole...")
 cp_session = assume_role(session, CONTROL_PLANE_ROLE_ARN, "tutorial-00-cp")
-cp_client = cp_session.client(
-    "bedrock-agentcore-control", endpoint_url=PAYMENTS_CP_ENDPOINT
-)
-cred_client = cp_session.client(
-    "bedrock-agentcore-control", endpoint_url=PAYMENTS_CP_ENDPOINT
-)
+cp_client = cp_session.client("bedrock-agentcore-control", endpoint_url=PAYMENTS_CP_ENDPOINT)
+cred_client = cp_session.client("bedrock-agentcore-control", endpoint_url=PAYMENTS_CP_ENDPOINT)
 
 print("Assuming ManagementRole...")
 mgmt_session = assume_role(session, MANAGEMENT_ROLE_ARN, "tutorial-00-mgmt")
@@ -273,9 +287,7 @@ if resp:
 # ── Step 6 — Create Payment Connector ─────────────────────────────────────────
 # Links the Manager to the Credential Provider.
 print("\n── Step 6: Create Payment Connector ──")
-connector_type = (
-    "CoinbaseCDP" if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP" else "StripePrivy"
-)
+connector_type = "CoinbaseCDP" if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP" else "StripePrivy"
 cred_key = "coinbaseCDP" if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP" else "stripePrivy"
 
 resp = idempotent_create(
@@ -285,9 +297,7 @@ resp = idempotent_create(
     name=CONNECTOR_NAME,
     description=f"{CONNECTOR_NAME} {connector_type}",
     type=connector_type,
-    credentialProviderConfigurations=[
-        {cred_key: {"credentialProviderArn": CREDENTIAL_PROVIDER_ARN}}
-    ],
+    credentialProviderConfigurations=[{cred_key: {"credentialProviderArn": CREDENTIAL_PROVIDER_ARN}}],
     clientToken=client_token(),
 )
 if resp:
@@ -324,9 +334,7 @@ resp = dp_client.create_payment_instrument(
 )
 pp("CreatePaymentInstrument", resp)
 INSTRUMENT_ID = resp["paymentInstrument"]["paymentInstrumentId"]
-WALLET_ADDRESS = resp["paymentInstrument"]["paymentInstrumentDetails"][
-    "embeddedCryptoWallet"
-]["walletAddress"]
+WALLET_ADDRESS = resp["paymentInstrument"]["paymentInstrumentDetails"]["embeddedCryptoWallet"]["walletAddress"]
 print(f"\n  instrumentId:  {INSTRUMENT_ID}")
 print(f"  walletAddress: {WALLET_ADDRESS}")
 
@@ -340,9 +348,7 @@ wait_for_status(
     userId=USER_ID,
 )
 print("  ✅ Instrument is ACTIVE")
-update_env_file(
-    ENV_FILE, {"INSTRUMENT_ID": INSTRUMENT_ID, "WALLET_ADDRESS": WALLET_ADDRESS}
-)
+update_env_file(ENV_FILE, {"INSTRUMENT_ID": INSTRUMENT_ID, "WALLET_ADDRESS": WALLET_ADDRESS})
 
 # ── Step 7a — Fetch WalletHub URL (Coinbase only) ─────────────────────────────
 if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP":
@@ -352,12 +358,8 @@ if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP":
     pm = PaymentManager(payment_manager_arn=MANAGER_ARN, region_name=AWS_REGION)
     redirect_url = None
     for attempt in range(6):
-        instr_details = pm.get_payment_instrument(
-            user_id=USER_ID, payment_instrument_id=INSTRUMENT_ID
-        )
-        wallet_info = instr_details.get("paymentInstrumentDetails", {}).get(
-            "embeddedCryptoWallet", {}
-        )
+        instr_details = pm.get_payment_instrument(user_id=USER_ID, payment_instrument_id=INSTRUMENT_ID)
+        wallet_info = instr_details.get("paymentInstrumentDetails", {}).get("embeddedCryptoWallet", {})
         redirect_url = wallet_info.get("redirectUrl")
         if redirect_url:
             break
@@ -369,9 +371,7 @@ if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP":
     else:
         print("\n  ⚠️  WalletHub URL not yet available after ~25s. Re-run to retry.")
 else:
-    print(
-        "\n  Skipping WalletHub fetch (StripePrivy uses the Privy reference frontend)."
-    )
+    print("\n  Skipping WalletHub fetch (StripePrivy uses the Privy reference frontend).")
 
 # ── Step 7b — Fund the Wallet + Delegate Signing (MANUAL STEP) ───────────────
 faucet_network = "Base Sepolia" if NETWORK == "ETHEREUM" else "Solana Devnet"
@@ -385,9 +385,7 @@ print(f"""
 if NETWORK == "ETHEREUM":
     print(f"  Verify: https://sepolia.basescan.org/address/{WALLET_ADDRESS}")
 else:
-    print(
-        f"  Verify: https://explorer.solana.com/address/{WALLET_ADDRESS}?cluster=devnet"
-    )
+    print(f"  Verify: https://explorer.solana.com/address/{WALLET_ADDRESS}?cluster=devnet")
 
 if CREDENTIAL_PROVIDER_TYPE == "CoinbaseCDP":
     print("""
@@ -405,6 +403,8 @@ else:
     3. Choose Connect agent → Give access.
 """)
 
+input("  Press Enter when funding and delegation are complete... ")
+
 # ── Step 7c — Verify Wallet Balance (Optional) ───────────────────────────────
 chain = "BASE_SEPOLIA" if NETWORK == "ETHEREUM" else "SOLANA_DEVNET"
 try:
@@ -420,14 +420,10 @@ try:
     amount = int(token_balance.get("amount", "0")) / 1_000_000
     print(f"  Wallet balance: {amount:.2f} USDC on {chain}")
     if amount == 0:
-        print(
-            "  ⚠️  Wallet has no USDC yet. Fund it via the faucet before running Tutorial 01."
-        )
+        print("  ⚠️  Wallet has no USDC yet. Fund it via the faucet before running Tutorial 01.")
 except Exception as e:
     print(f"  ⚠️  Balance check failed: {e}")
-    print(
-        "  You can proceed to Step 8 — balance is verified through payment success in Tutorial 01."
-    )
+    print("  You can proceed to Step 8 — balance is verified through payment success in Tutorial 01.")
 
 # ── Step 8 — Create Payment Session ──────────────────────────────────────────
 # Time-bounded payment limits. value must be a string. currency is USD (not USDC).
@@ -462,9 +458,7 @@ except Exception as e:
 
 # ── Step 9 — Verify Setup ─────────────────────────────────────────────────────
 print("\n── Step 9: Verify Setup ──")
-resp = dp_client.get_payment_session(
-    paymentManagerArn=MANAGER_ARN, paymentSessionId=SESSION_ID, userId=USER_ID
-)
+resp = dp_client.get_payment_session(paymentManagerArn=MANAGER_ARN, paymentSessionId=SESSION_ID, userId=USER_ID)
 sess = resp["paymentSession"]
 assert sess["paymentSessionId"] == SESSION_ID
 print(f"  paymentSessionId:    {sess['paymentSessionId']}")
