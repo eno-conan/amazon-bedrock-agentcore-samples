@@ -1,7 +1,5 @@
 """Gateway Interceptor Lambda の単体テスト。"""
 
-import pytest
-
 from ntt_data_agent.interceptor.handler import lambda_handler
 
 
@@ -34,7 +32,11 @@ def test_response_non_streaming_with_status_and_headers() -> None:
     event = {
         "mcp": {
             "gatewayRequest": {"body": {"method": "tools/call"}},
-            "gatewayResponse": {"body": body, "statusCode": 200, "headers": {"x-foo": "bar"}},
+            "gatewayResponse": {
+                "body": body,
+                "statusCode": 200,
+                "headers": {"x-foo": "bar"},
+            },
         }
     }
     result = _call(event)

@@ -69,12 +69,16 @@ def _handle_response(gateway_request: dict, gateway_response: dict) -> dict:
             out["statusCode"] = gateway_response.get("statusCode", 200)
         if has_headers:
             out["headers"] = gateway_response.get("headers", {})
-        return {"interceptorOutputVersion": "1.0", "mcp": {"transformedGatewayResponse": out}}
+        return {
+            "interceptorOutputVersion": "1.0",
+            "mcp": {"transformedGatewayResponse": out},
+        }
 
     is_first_event = has_status
     if is_first_event:
         logger.info(
-            "RESPONSE interceptor (streaming, first event): inbound=%r id=%r — passing through",
+            "RESPONSE interceptor (streaming, first event): "
+            "inbound=%r id=%r — passing through",
             inbound_method,
             msg_id,
         )

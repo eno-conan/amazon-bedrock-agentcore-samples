@@ -1,0 +1,14 @@
+{
+  "app": "uv run python infra/app.py",
+  "context": {
+    "cognito_domain_prefix": "ntt-data-agent",
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": true,
+    "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
+    "@aws-cdk/core:stackRelativeExports": true
+  },
+  "watch": {
+    "include": ["infra/**", "src/**"],
+    "exclude": [".venv/**", "**/__pycache__/**", ".git/**", "*.pyc"]
+  }
+}

@@ -85,7 +85,9 @@ def get_sales_report(period: str) -> dict:
     """指定期間の売上レポートを返す（例: 2026-Q1）。"""
     report = _SALES_REPORT.get(period)
     if not report:
-        raise HTTPException(status_code=404, detail=f"Sales report for {period!r} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Sales report for {period!r} not found"
+        )
     return report
 
 

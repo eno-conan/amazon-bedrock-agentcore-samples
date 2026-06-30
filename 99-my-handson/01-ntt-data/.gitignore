@@ -10,5 +10,14 @@ wheels/
 .venv
 .ruff_cache
 
+# CDK
+cdk.out/
+cdk.context.json
+
+# Environment variables
+.env
+cognito_config.json
+agentcore_config.json
+
 # Claude Code Plans
 plans/

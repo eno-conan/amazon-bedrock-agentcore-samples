@@ -50,6 +50,31 @@ tasks:
       - uv run python -m ntt_data_agent.setup.agentcore
 
   agent:dev:
-    desc: "エージェントをローカルで起動"
+    desc: "エージェントをローカルで起動（.env から環境変数をロード）"
     cmds:
-      - uv run python -m ntt_data_agent.agent.main
+      - uv run --env-file .env python -m ntt_data_agent.agent.main
+
+  agent:invoke:
+    desc: "ローカルサーバーへテストリクエストを送信（例: task agent:invoke -- 顧客一覧を教えて）"
+    cmds:
+      - uv run --env-file .env python scripts/invoke.py {{.CLI_ARGS}}
+
+  infra:synth:
+    desc: "CloudFormation テンプレートを生成して検証（デプロイしない）"
+    cmds:
+      - cdk synth
+
+  infra:diff:
+    desc: "現在のデプロイ済みスタックとの差分を表示"
+    cmds:
+      - cdk diff --all
+
+  infra:deploy:
+    desc: "全スタックをデプロイ（Storage → Cognito → MockApi の順）"
+    cmds:
+      - cdk deploy --all --require-approval never
+
+  infra:destroy:
+    desc: "全スタックのリソースを削除"
+    cmds:
+      - cdk destroy --all --force

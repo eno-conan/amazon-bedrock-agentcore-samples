@@ -1,0 +1,11 @@
+{
+  "pool_id": "ap-northeast-1_6dTm0j9gX",
+  "client_id": "3vg65ug18gi444rg01rlcdpgp3",
+  "discovery_url": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_6dTm0j9gX/.well-known/openid-configuration",
+  "region": "ap-northeast-1",
+  "username": "testuser",
+  "m2m_client_id": "5qoicuekrpvgcd7fmp0t222uoh",
+  "m2m_client_secret": "1p2uo3j8n1kb8o6p4a6lha47003l33ildp6jfq6s7pnobapotkms",
+  "m2m_token_endpoint": "https://ntt-data-agent.auth.ap-northeast-1.amazoncognito.com/oauth2/token",
+  "m2m_scope": "https://api.ntt-data-agent.internal/read"
+}

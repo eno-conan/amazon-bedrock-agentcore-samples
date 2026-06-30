@@ -1,0 +1,93 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "NttDataAgent-CRM",
+    "description" : "モック CRM API エンドポイント",
+    "version" : "2026-06-30T07:38:22Z"
+  },
+  "servers" : [ {
+    "url" : "https://0low50j8c3.execute-api.ap-northeast-1.amazonaws.com/{basePath}",
+    "variables" : {
+      "basePath" : {
+        "default" : "v1"
+      }
+    }
+  } ],
+  "paths" : {
+    "/{proxy+}" : {
+      "options" : {
+        "parameters" : [ {
+          "name" : "proxy",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "204 response",
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Methods" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Headers" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : { }
+          }
+        }
+      },
+      "x-amazon-apigateway-any-method" : {
+        "parameters" : [ {
+          "name" : "proxy",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/" : {
+      "options" : {
+        "responses" : {
+          "204" : {
+            "description" : "204 response",
+            "headers" : {
+              "Access-Control-Allow-Origin" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Methods" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              },
+              "Access-Control-Allow-Headers" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : { }
+          }
+        }
+      },
+      "x-amazon-apigateway-any-method" : { }
+    }
+  },
+  "components" : { },
+  "x-amazon-apigateway-security-policy" : "TLS_1_0"
+}

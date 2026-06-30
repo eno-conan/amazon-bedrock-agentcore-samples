@@ -1,6 +1,5 @@
 """モックCRM API エンドポイントの単体テスト。"""
 
-import pytest
 from fastapi.testclient import TestClient
 
 from ntt_data_agent.mock_api.crm_handler import app

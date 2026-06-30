@@ -1,0 +1,7 @@
+{
+  "gateway_id": "ntt-data-agent-gateway-ntxfya0aca",
+  "gateway_url": "https://ntt-data-agent-gateway-ntxfya0aca.gateway.bedrock-agentcore.ap-northeast-1.amazonaws.com/mcp",
+  "crm_target_id": "GZ6RSMCYXE",
+  "bi_target_id": "7GEFA37ZQB",
+  "gateway_role_arn": "arn:aws:iam::109923486398:role/NttDataAgentGatewayRole"
+}

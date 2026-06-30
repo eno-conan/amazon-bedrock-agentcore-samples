@@ -4,7 +4,6 @@ import json
 from unittest.mock import MagicMock, patch
 
 import httpx
-import pytest
 
 
 def _make_response(status_code: int, data: object) -> httpx.Response:
@@ -141,7 +140,10 @@ class TestGetSalesReport:
 
 class TestGetPipelineSummary:
     def test_returns_summary(self) -> None:
-        summary = {"total_open_amount": 245_000_000, "forecast_next_quarter": 200_000_000}
+        summary = {
+            "total_open_amount": 245_000_000,
+            "forecast_next_quarter": 200_000_000,
+        }
         mock_res = _make_response(200, summary)
 
         with patch("ntt_data_agent.tools.bi._client") as mock_client_fn:

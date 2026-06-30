@@ -19,15 +19,23 @@ from opentelemetry import trace
 from strands import Agent
 from strands.models import BedrockModel
 
-from ntt_data_agent.tools.bi import get_customer_analysis, get_pipeline_summary, get_sales_report
-from ntt_data_agent.tools.crm import get_customer_detail, get_customers, get_opportunities
+from ntt_data_agent.tools.bi import (
+    get_customer_analysis,
+    get_pipeline_summary,
+    get_sales_report,
+)
+from ntt_data_agent.tools.crm import (
+    get_customer_detail,
+    get_customers,
+    get_opportunities,
+)
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 app = BedrockAgentCoreApp()
 
-_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "us.anthropic.claude-sonnet-4-6-20250514-v1:0")
+_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "jp.anthropic.claude-sonnet-4-6")
 _REGION = os.getenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 
 SYSTEM_PROMPT = """あなたは営業支援 AI エージェントです。

@@ -3,19 +3,24 @@ repos:
     hooks:
       - id: ruff
         name: ruff
-        entry: uv run ruff check --fix
+        entry: uv run --directory 99-my-handson/01-ntt-data ruff check --fix
         language: system
         types: [python]
+        files: ^99-my-handson/01-ntt-data/
+        pass_filenames: false
 
       - id: ruff-format
         name: ruff-format
-        entry: uv run ruff format
+        entry: uv run --directory 99-my-handson/01-ntt-data ruff format
         language: system
         types: [python]
+        files: ^99-my-handson/01-ntt-data/
+        pass_filenames: false
 
       - id: pyright
         name: pyright
-        entry: uv run pyright
+        entry: uv run --directory 99-my-handson/01-ntt-data pyright
         language: system
         types: [python]
+        files: ^99-my-handson/01-ntt-data/
         pass_filenames: false
