@@ -1,0 +1,55 @@
+version: "3"
+
+tasks:
+  setup:
+    desc: "依存関係インストール + pre-commit フック設定"
+    cmds:
+      - uv sync
+      - uv run pre-commit install
+
+  check:
+    desc: "lint → format → typecheck を順に実行"
+    cmds:
+      - task: lint
+      - task: format
+      - task: typecheck
+
+  lint:
+    desc: "ruff でリント（自動修正あり）"
+    cmds:
+      - uv run ruff check --fix
+
+  format:
+    desc: "ruff でフォーマット"
+    cmds:
+      - uv run ruff format
+
+  typecheck:
+    desc: "pyright で型チェック"
+    cmds:
+      - uv run pyright
+
+  test:
+    desc: "pytest でテスト実行"
+    cmds:
+      - uv run pytest
+
+  setup:cognito:
+    desc: "Cognito User Pool を作成（AWS リソース作成）"
+    cmds:
+      - uv run python -m ntt_data_agent.setup.cognito
+
+  setup:mock-api:
+    desc: "モックAPI Lambda + API Gateway をデプロイ（AWS リソース作成）"
+    cmds:
+      - uv run python -m ntt_data_agent.setup.mock_api
+
+  setup:agentcore:
+    desc: "AgentCore Identity / Gateway を設定（AWS リソース作成）"
+    cmds:
+      - uv run python -m ntt_data_agent.setup.agentcore
+
+  agent:dev:
+    desc: "エージェントをローカルで起動"
+    cmds:
+      - uv run python -m ntt_data_agent.agent.main
